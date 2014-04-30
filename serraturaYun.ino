@@ -6,6 +6,7 @@
 
 #define IRQ   (4)
 #define RESET (6)  // Not connected by default on the NFC Shield
+#define PYPATH F("/mnt/sda1/arduino/www/serraturaYun/logger.py")
 
 Adafruit_NFCShield_I2C nfc(IRQ, RESET);
 
@@ -35,8 +36,8 @@ void loop() {
 
   uint8_t successID;
   uint8_t uid[] = { 
-    0, 0, 0, 0, 0, 0, 0       };  // Buffer to store the returned UID
-  uint8_t uidLength;                        // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
+    0, 0, 0, 0, 0, 0, 0 };  // Buffer to store the returned UID
+  uint8_t uidLength;       // Length of the UID (4 or 7 bytes depending on ISO14443A card type)
 
   // it's a blocking function
   successID = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength);
@@ -50,11 +51,17 @@ void loop() {
 #endif
     Process p;
     p.begin("python");
-    p.addParameter("/root/logger.py");
+    p.addParameter(PYPATH);
     
     for(int i = 0; i < uidLength; i++)
       p.addParameter(String(uid[i]));
+
     p.run();
+    Serial.print("The user is trying to open the door\n");
+    while(p.available()){
+      char c = p.read();
+      Serial.print(c);
+    }
   }
 
   // save the previous TAG ID    
