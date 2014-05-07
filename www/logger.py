@@ -5,7 +5,7 @@ import sqlite3
 from datetime import datetime
 import os
 source_dir = os.path.dirname(os.path.abspath(__file__))
-cardcode = ''.join(argv[1:])
+cardcode = ''.join(argv[1])
 
 def insert_user(username=None, cardcode=None):
 	db = sqlite3.connect(os.path.join(source_dir, 'logger.db'))
