@@ -2,7 +2,7 @@
 #include <Adafruit_NFCShield_I2C.h>
 #include <Bridge.h>
 
-#define DEBUG
+//#define DEBUG
 
 #define IRQ   (4)
 #define RESET (6)  // Not connected by default on the NFC Shield
