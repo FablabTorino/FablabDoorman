@@ -45,14 +45,15 @@ The sketch would be normally compiled and flahsed on the microcontroller and the
 ##### Database Structure
 The database is called *logger.db* and is structured with two tables called *allowedusers* and *inothedoor*.  
 The **allowedusers** is the table containing the all the users who can open the door. Table structure:  
-* id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL
-* username TEXT NOT NULL, 
-* cardcode TEXT NOT NULL  
+* id *INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL*
+* username *TEXT NOT NULL*
+* cardcode *TEXT NOT NULL* (must be expressed in hex format without any separator and no prefix)
+* timeAccessProfile *TEXT NOT NULL* (can be defined inside the python script)
 
 The **intothedoor** is a table used to log all the access, structured with the following scheme:
-* id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL
-* datetime TEXT NOT NULL
-* cardcode TEXT NOT NULL
+* id *INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL*
+* datetime *TEXT NOT NULL*
+* cardcode *TEXT NOT NULL*
 
 For simplicty database structure is automatically created after the first execution. You can connect to your YUN via SSH and manually run the python script to setup the database.
 
@@ -60,7 +61,29 @@ For simplicty database structure is automatically created after the first execut
 Adding a new user can be made only manually by inserting a new row to the *allowedusers* table. Instructions:
 * connect to your YUN via SSH
 * move to the *FablabDoorman* directory: ```$ cd /mnt/sd/arduino/www/FablamDoorman```
-* open the database: ```sqlite3 logger.db```
+* open the database: ```sqlite3 logger.db```  
+  this will open the database in the interactive mode and now you can issue the sqlite3 commands to operate on the tables
+* **Insert new user**:  
+  ```INSERT INTO allowedusers (username, cardcode, timeAccessProfile)] VALUES ("Mario Rossi", "A1B2C3D4", "ordinario");```
+* **modify a user**, such as if you want to change the cardcode or the time profile:  
+  ```UPDATE allowedusers SET cardcode="DEADBEEF" WHERE username="Mario Rossi";```
+* **Delete a User**:  
+  ```DELETE FROM allowedusers WHERE username="Mario Rossi";``` 
+
+##### Checking the Log file
+Checking the log file is fairly easy if you are connected via SSH to the YUN. Simply open the database as described above and submit your query. A couple of examples:
+* View the entire log:
+  ```SELECT * from intothedoor;```
+* use the *WHERE* clause to filter your query, example:  
+  ```SELECT * from intothedoor WHERE username="Mario Rossi";``` 
+
+
+#### TODO
+We experienced that this system isn't enough reliable to work 24-7, it requieres to be rebooted occasionally.
+You can activate the watchdog that will reboot the YUN if the Linux kernel get stuck.
+```$ watchdog /dev/watchdog``` to activate with defaults parameters  
+Otherwise you can configure a cron job to restart the YUN periodically. 
+
 
 
 
